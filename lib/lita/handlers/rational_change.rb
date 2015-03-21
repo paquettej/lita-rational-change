@@ -6,8 +6,9 @@ module Lita
       # build a link to ratus1 here
       def build_cr_link(response)
         url = "http://10.2.241.182:8600/change/PTweb?ACTION_FLAG=frameset_form&TEMPLATE_FLAG=ProblemReportView&database=%2Fcm%2Fccmdb%2Feverest&role=User&problem_number="
-        url += CGI::escape(response.matches)
-        response.reply("CR #{response.matches} can be viewed at #{url}")
+        cr = response.matches.first.first
+        url += CGI::escape(cr)
+        response.reply("CR #{cr} can be viewed at #{url}")
       end
       
     end

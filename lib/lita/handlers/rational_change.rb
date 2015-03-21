@@ -1,7 +1,7 @@
 module Lita
   module Handlers
     class RationalChange < Handler
-      route %r{(\S{0,3}#\d+4)}, :build_cr_link
+      route %r{(\S{0,3}#\d+)}, :build_cr_link
       
       # build a link to ratus1 here
       def build_cr_link(response)

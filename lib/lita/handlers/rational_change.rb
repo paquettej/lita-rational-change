@@ -2,7 +2,7 @@ module Lita
   module Handlers
     class RationalChange < Handler
       
-      route %r{(\S{0,3}#\d+)}, :build_cr_link
+      route %r{(\S{0,3}#\d+)}i, :build_cr_link
 
       attr_accessor  :base_url
       

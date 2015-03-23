@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["jeff@snowmoonsoftware.com"]
   spec.description   = "Generates a CR link from a defect number for Rational Change"
   spec.summary       = "Generates a CR link from a defect number for Rational Change"
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/snowmoonsoftware/lita-rational-change"
   spec.license       = "MIT"
   spec.metadata      = { "lita_plugin_type" => "handler" }
 

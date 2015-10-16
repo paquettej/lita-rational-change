@@ -8,6 +8,9 @@ module Lita
 
       # build a link to ratus1 here 
       def build_cr_link(response) 
+        # don't respond to own messages -- why does this happen?
+        return if response.user.name == Lita.config.robot.name
+        
         cr_list = response.matches.flatten 
 
         body_text = build_links(cr_list) 

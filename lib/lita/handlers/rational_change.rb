@@ -3,39 +3,50 @@ module Lita
     class RationalChange < Handler 
 
       config :base_url, type: String, required: true 
+      config :timeout, type: Float, default: 600.0, required: false
 
       route %r{(\S{0,3}#\d+)}i, :build_cr_link 
 
       # build a link to ratus1 here 
       def build_cr_link(response) 
         # don't respond to own messages -- why does this happen?
-        return if response.user.name == Lita.config.robot.name
-        
+        if response.user.name == Lita.config.robot.name
+          Lita.logger.warn "received message from myself, ignoring..."
+          return
+        end
+                  
         cr_list = response.matches.flatten 
 
-        body_text = build_links(cr_list) 
+        # TODO: don't format urls, just get a list of crs that need to be talked about. FORMAT later!
+        visible_crs = load_crs(cr_list)
+        Lita.logger.info("visible_crs count: #{visible_crs.length}")
+        
+        # links = build_links(cr_list)
+        # body_text = links.join(', ')
 
-        case robot.config.robot.adapter 
-        when :slack 
-          target = response.message.source.room_object || response.message.source.user 
-          robot.chat_service.send_attachment(target, build_attachment(body_text)) 
-        else 
-          response.reply(render_template('cr', cr: cr, url: url)) 
-        end 
+        if visible_crs.any?
+          case robot.config.robot.adapter 
+          when :slack 
+            target = response.message.source.room_object || response.message.source.user 
+            robot.chat_service.send_attachment(target, build_attachment(visible_crs.collect(&:url))) 
+          else 
+              response.reply(render_template('cr', cr: visible_crs.first, url: visible_crs.first.url)) 
+          end 
+          visible_crs.map(&:mentioned!)
+        end
       end 
 
-      def build_links(cr_list) 
-        cr_list.map{|cr| format_url(cr)}.join(', ') 
-      end 
-
-      def format_url(cr) 
-        "<#{build_url(cr)}|#{cr}>" 
-      end 
-
-      def build_url(cr) 
-        config.base_url + CGI::escape(cr) 
-      end 
-
+      def load_crs(cr_list)
+        links = []
+        cr_list.each do |cr|
+          change_request = ChangeRequest.new(cr, redis)
+          Lita.logger.info "CR #{change_request.name} mention status #{change_request.mentioned_recently?}"
+          links << change_request unless change_request.mentioned_recently?
+        end
+        links
+      end
+      
+      # build the attachment object for slack
       def build_attachment(text) 
         Lita::Adapters::Slack::Attachment.new(text, 
         { 

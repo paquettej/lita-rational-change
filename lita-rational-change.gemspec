@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = "lita-rational-change"
-  spec.version       = "0.0.4"
+  spec.version       = "0.0.5"
   spec.authors       = ["Jeff Paquette"]
   spec.email         = ["jeff@snowmoonsoftware.com"]
   spec.description   = "Generates a CR link from a defect number for Rational Change"

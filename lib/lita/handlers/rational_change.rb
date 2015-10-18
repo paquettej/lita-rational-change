@@ -32,9 +32,11 @@ module Lita
       end 
 
       def format_urls_for_slack(crs)
+        links = []
         crs.each do |cr|
-          format_url(cr)
+          links << format_url(cr)
         end
+        links
       end
       
       def format_url(cr) 

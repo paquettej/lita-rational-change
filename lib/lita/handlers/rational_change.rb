@@ -15,26 +15,31 @@ module Lita
           return
         end
                   
-        cr_list = response.matches.flatten 
-
-        # TODO: don't format urls, just get a list of crs that need to be talked about. FORMAT later!
-        visible_crs = load_crs(cr_list)
+        visible_crs = load_crs(response.matches.flatten)
         Lita.logger.info("visible_crs count: #{visible_crs.length}")
         
-        # links = build_links(cr_list)
-        # body_text = links.join(', ')
-
         if visible_crs.any?
           case robot.config.robot.adapter 
           when :slack 
             target = response.message.source.room_object || response.message.source.user 
-            robot.chat_service.send_attachment(target, build_attachment(visible_crs.collect(&:url))) 
+            urls = format_urls_for_slack(visible_crs)
+            robot.chat_service.send_attachment(target, build_attachment(urls.join(',')))
           else 
-              response.reply(render_template('cr', cr: visible_crs.first, url: visible_crs.first.url)) 
+            response.reply(render_template('cr', cr: visible_crs.first, url: visible_crs.first.url)) 
           end 
           visible_crs.map(&:mentioned!)
         end
       end 
+
+      def format_urls_for_slack(crs)
+        crs.each do |cr|
+          format_url(cr)
+        end
+      end
+      
+      def format_url(cr) 
+        "<#{cr.url}|#{cr.name}>" 
+      end       
 
       def load_crs(cr_list)
         links = []

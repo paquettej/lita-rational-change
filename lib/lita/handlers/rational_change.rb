@@ -23,7 +23,7 @@ module Lita
           when :slack 
             target = response.message.source.room_object || response.message.source.user 
             urls = format_urls_for_slack(visible_crs)
-            robot.chat_service.send_attachment(target, build_attachment(urls.join(',')))
+            robot.chat_service.send_attachment(target, build_attachment(urls.join(', ')))
           else 
             response.reply(render_template('cr', cr: visible_crs.first, url: visible_crs.first.url)) 
           end 
